@@ -65,18 +65,18 @@ def welcome(netid):
 @app.route('/edit-student/<name>', methods=['GET', 'POST'])
 def edit_student(name):
     student = db.session.query(models.Student)\
-        .filter(models.Drinker.name == name).one()
+        .filter(models.Student.name == name).one()
     restaurant = db.session.query(models.Restaurant).all()
     food = db.session.query(models.Food).all()
-	allergen = db.session.query(models.Allergen).all()
+    allergen = db.session.query(models.Allergens).all()
     form = forms.StudentEditFormFactory.form(student, restaurant, food, allergen)
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.Student.edit(name, form.name.data, 
+            models.Student.edit(name, form.name.data, student.netid, form.netid.data,
                                 form.get_restaurant_freq(), form.get_food_liked(),
 							   form.get_allergens())
-            return redirect(url_for('student', name=form.name.data))
+            return redirect(url_for('edit_student', name=form.name.data))
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('edit-student.html', student=student, form=form)
