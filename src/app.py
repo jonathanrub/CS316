@@ -12,7 +12,7 @@ db = SQLAlchemy(app, session_options={'autocommit': False})
 @app.route('/')
 def all_restaurants():
     restaurants = db.session.query(models.Restaurant).all()
-    return render_template('all-drinkers.html', restaurants=restaurants)
+    return render_template('all-restaurants.html', restaurants=restaurants)
 
 @app.route('/restaurant/<name>')
 def restaurant(name):
@@ -61,6 +61,25 @@ def welcome(netid):
         if(isopen.open_time <= time and isopen.close_time >= time):
             openRestaurants.append(rest)
     return render_template('welcome.html',student=student,openRestaurants=openRestaurants)
+
+@app.route('/add-student', methods=['GET', 'POST'])
+def add_student():
+    restaurant = db.session.query(models.Restaurant).all()
+    food = db.session.query(models.Food).all()
+    allergen = db.session.query(models.Allergens).all()
+    form = forms.AddStudentFormFactory.form(restaurant, food, allergen)
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            models.Student.add(form.name.data, form.netid.data,
+                                form.get_restaurant_freq(), form.get_food_liked(),
+							   form.get_allergens())
+            return redirect('welcome/' + form.netid.data
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('add-Student.html', form=form)
+    else:
+        return render_template('add-Student.html', form=form)
 
 @app.route('/edit-student/<name>', methods=['GET', 'POST'])
 def edit_student(name):

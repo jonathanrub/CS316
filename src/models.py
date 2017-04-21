@@ -62,7 +62,27 @@ class Student(db.Model):
     eats_at = orm.relationship('EatsAt')
     eats = orm.relationship('Eats')
     is_allergic_to = orm.relationship('IsAllergicTo')
+	
+    @staticmethod
+    def add(new_name, new_netid, restaurants, food_liked, allergic_to):
+        try:
+            print new_netid
+            db.session.execute('INSERT INTO student VALUE(:name, :foodpoint_plan, :netid)',dict(netid=new_netid, name=new_name, foodpoint_plan="a"))
 
+            for rest in restaurants:
+                db.session.execute('INSERT INTO eatsat VALUES(:student_netid, :restaurant_name)',dict(student_netid=new_netid, restaurant_name=rest))
+
+            for foo in food_liked:
+                db.session.execute('INSERT INTO eats VALUES(:student_netid, :food_name)',dict(student_netid=new_netid, food_name=foo))
+							   
+            for aller in allergic_to:
+                db.session.execute('INSERT INTO isallergicto VALUES(:allergenType, :student_netid)',dict(student_netid=new_netid, allergenType=aller[0]))
+            
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+			
     @staticmethod
     def edit(old_name, name, old_netid, netid, restaurant_freq, food_liked, allergic_to):
         try:
