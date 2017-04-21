@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block heading %}Edit Drinker Information: {{drinker.name}}{% endblock %}
+{% block heading %}Edit Student Information: {{student.name}}{% endblock %}
 {% block content %}
 <form action="{{url_for('edit_student', name=student.name, netid=student.netid)}}" method="POST">
   {{form.csrf_token}}
@@ -41,7 +41,7 @@
   </p>
  <p>Alergens(s) have:
     <ul>
-      {% for alergens, field in form.allergens_fields() %}
+      {% for alergens, field in form.allergen_fields() %}
       <li>
         {{alergens}}: {{field}}
         {% if field.errors %}

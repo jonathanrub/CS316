@@ -36,29 +36,27 @@ class StudentEditFormFactory:
                 return 'allergen_{}'.format(index)
             def allergen_fields(self):
                 for i, allergens in enumerate(allergen):
-                    yield allergens.name, getattr(self, F.allergen_field_name(i))
-            def get_allergen_liked(self):
+                    yield allergens.allergenType, getattr(self, F.allergen_field_name(i))
+            def get_allergens(self):
                 for allergens, field in self.allergen_fields():
                     if field.data != 0:
                         yield allergens, field.data
 								
-        restaurant_freq = [restaufreq.name for restafreq in student.eatsat]
+        restaurant_freq = [restafreq.restaurant_name for restafreq in student.eats_at]
         for i, rest in enumerate(restaurant):
             field_name = F.restaurant_field_name(i)
             default = 'checked' if rest.name in restaurant_freq else None
             setattr(F, field_name, BooleanField(default=default))
-			
         food_liked = [foodlike.name for foodlike in student.eats]
         for i, foo in enumerate(food):
             field_name = F.food_field_name(i)
             default = 'checked' if foo.name in food_liked else None
             setattr(F, field_name, BooleanField(default=default))
-			
         allergic_to = [allerto.allergenType for allerto in student.is_allergic_to]
         for i, aller in enumerate(allergen):
             field_name = F.allergen_field_name(i)
-            default = 'checked' if aller.name in allergic_to else None
+            default = 'checked' if aller.allergenType in allergic_to else None
             setattr(F, field_name, BooleanField(default=default))
-		
-	
+
+
         return F()
