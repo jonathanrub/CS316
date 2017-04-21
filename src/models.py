@@ -62,15 +62,13 @@ class Student(db.Model):
     eats_at = orm.relationship('EatsAt')
     eats = orm.relationship('Eats')
     is_allergic_to = orm.relationship('IsAllergicTo')
-	@staticmethod
+    @staticmethod
     def edit(old_name, name, old_netid, netid, restaurant_freq, food_liked, allergic_to):
         try:
-			db.session.execute('DELETE FROM eatsat WHERE student_netid = :netid',
+            db.session.execute('DELETE FROM eatsat WHERE student_netid = :netid',
                                dict(netid=old_netid))
-            db.session.execute('DELETE FROM eats WHERE student_netid = :netid',
-                               dict(netid=old_netid))
-			db.session.execute('DELETE FROM isallergicto WHERE student_netid = :netid',
-                               dict(netid=old_netid))
+            db.session.execute('DELETE FROM eats WHERE student_netid = :netid',                        dict(netid=old_netid))
+            db.session.execute('DELETE FROM isallergicto WHERE student_netid = :netid',dict(netid=old_netid))
 			
             db.session.execute('UPDATE student SET name = :name, netid = :netid'
                                ' WHERE netid = :old_etid',
@@ -79,10 +77,10 @@ class Student(db.Model):
             for rest in restaurant_freq:
                 db.session.execute('INSERT INTO eatsat VALUES(:student_netid, :restaurant_name)',
                                    dict(student_netid=netid, restaurant_name=rest))
-			for foo in food_liked:
+            for foo in food_liked:
                 db.session.execute('INSERT INTO eatsat VALUES(:student_netid, :food_name)',
                                    dict(student_netid=netid, food_name=foo))
-			for aller in allergic_to:
+            for aller in allergic_to:
                 db.session.execute('INSERT INTO eatsat VALUES(:student_netid, :allergenType)',
                                    dict(student_netid=netid, allergenType=aller))
             

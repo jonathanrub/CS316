@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, LoginManager 
 from flask_sqlalchemy import SQLAlchemy
 import models
 import forms
@@ -12,7 +12,7 @@ db = SQLAlchemy(app, session_options={'autocommit': False})
 @app.route('/')
 def all_restaurants():
     restaurants = db.session.query(models.Restaurant).all()
-    return render_template('all-drinkers.html', restaurants=restaurants)
+    return render_template('all-restaurants.html', restaurants=restaurants)
 
 @app.route('/restaurant/<name>')
 def restaurant(name):
@@ -64,11 +64,10 @@ def welcome(netid):
 
 @app.route('/edit-student/<name>', methods=['GET', 'POST'])
 def edit_student(name):
-    student = db.session.query(models.Student)\
-        .filter(models.Drinker.name == name).one()
+    student = db.session.query(models.Student).filter(models.Student.name == name).one()
+    allergen = db.session.query(models.Allergens).all()
     restaurant = db.session.query(models.Restaurant).all()
     food = db.session.query(models.Food).all()
-	allergen = db.session.query(models.Allergen).all()
     form = forms.StudentEditFormFactory.form(student, restaurant, food, allergen)
     if form.validate_on_submit():
         try:
