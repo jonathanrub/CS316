@@ -66,8 +66,7 @@ class Student(db.Model):
     @staticmethod
     def add(new_name, new_netid, restaurants, food_liked, allergic_to):
         try:
-            print new_netid
-            db.session.execute('INSERT INTO student VALUE(:name, :foodpoint_plan, :netid)',dict(netid=new_netid, name=new_name, foodpoint_plan="a"))
+            db.session.execute('INSERT INTO student VALUES(\'%s\', \'%s\', \'%s\')' % (new_netid, new_name, "a"))
 
             for rest in restaurants:
                 db.session.execute('INSERT INTO eatsat VALUES(:student_netid, :restaurant_name)',dict(student_netid=new_netid, restaurant_name=rest))

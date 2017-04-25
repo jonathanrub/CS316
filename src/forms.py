@@ -1,6 +1,13 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, IntegerField
-from wtforms.validators import DataRequired
+
+
+class LoginFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            netid = StringField(default="Enter Your Netid")
+        return F()
 
 class AddStudentFormFactory:
     @staticmethod
