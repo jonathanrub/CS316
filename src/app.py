@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 import models
 import forms
@@ -8,11 +8,37 @@ app = Flask(__name__)
 app.secret_key = 's3cr3t'
 app.config.from_object('config')
 db = SQLAlchemy(app, session_options={'autocommit': False})
+loginstatus = False
+user = None
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    error = None
+    form = forms.LoginFormFactory.form()
+    if form.validate_on_submit():
+        if request.form.get('login', None) == "Login":
+            user = db.session.query(models.Student).filter(models.Student.netid == form.netid.data).one()
+            if user is not None:
+                loginstatus = True
+                return redirect(url_for('welcome', netid = user.netid, openRestaurants=[]))
+            else:
+                error = 'Invalid NetID.'	
+            return render_template('login.html', form=form, error=error)
+        else:
+            return redirect(url_for('add_student'))   
+    return render_template('login.html', form=form, error=error)
+
+
+@app.route("/logout")
+def logout():
+    loginstatus = False
+    flash('You were logged out.')
+    return redirect(home())
+
+@app.route('/all-restaurants')
 def all_restaurants():
     restaurants = db.session.query(models.Restaurant).all()
-    return render_template('all-drinkers.html', restaurants=restaurants)
+    return render_template('all-restaurants.html', restaurants=restaurants)
 
 @app.route('/restaurant/<name>')
 def restaurant(name):
@@ -49,7 +75,7 @@ def welcome(netid):
     student = db.session.query(models.Student)\
         .filter(models.Student.netid == netid).one()
     favoriteRestaurants = db.session.query(models.EatsAt)\
-        .filter(models.EatsAt.student_netid == student.netid)
+        .filter(models.EatsAt.student_netid == netid)
     openRestaurants = []
     for rest in favoriteRestaurants:
         day = datetime.datetime.now().weekday()+1
@@ -60,7 +86,28 @@ def welcome(netid):
             continue 
         if(isopen.open_time <= time and isopen.close_time >= time):
             openRestaurants.append(rest)
-    return render_template('welcome.html',student=student,openRestaurants=openRestaurants)
+    return render_template('welcome.html', netid=netid,openRestaurants=openRestaurants)
+
+@app.route('/add-student', methods=['GET', 'POST'])
+def add_student():
+    restaurant = db.session.query(models.Restaurant).all()
+    food = db.session.query(models.Food).all()
+    allergen = db.session.query(models.Allergens).all()
+    form = forms.AddStudentFormFactory.form(restaurant, food, allergen)
+    if form.validate_on_submit():
+        try:
+            form.errors.pop('database', None)
+            models.Student.add(form.name.data, form.netid.data,
+                                form.get_restaurant_freq(), form.get_food_liked(),
+							   form.get_allergens())
+            user = netid=form.netid.data
+            db.session.commit()
+            return redirect(url_for('welcome', netid=form.netid.data,openRestaurants=[]))
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            return render_template('add-Student.html', form=form)
+    else:
+        return render_template('add-Student.html', form=form)
 
 @app.route('/search/')
 def search():
@@ -68,9 +115,9 @@ def search():
     return render_template('search.html',form=form)
 
 @app.route('/edit-student/<name>', methods=['GET', 'POST'])
-def edit_student(name):
+def edit_student(netid):
     student = db.session.query(models.Student)\
-        .filter(models.Student.name == name).one()
+        .filter(models.Student.netid == netid).one()
     restaurant = db.session.query(models.Restaurant).all()
     food = db.session.query(models.Food).all()
     allergen = db.session.query(models.Allergens).all()

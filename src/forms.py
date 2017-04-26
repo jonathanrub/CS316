@@ -3,6 +3,73 @@ from wtforms import StringField, BooleanField, IntegerField, SelectField
 from wtforms.validators import DataRequired
 from sqlalchemy import inspect
 
+
+
+class LoginFormFactory:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            netid = StringField(default="Enter Your Netid")
+        return F()
+
+class AddStudentFormFactory:
+    @staticmethod
+    def form(restaurant, food, allergen):
+        class F(FlaskForm):
+            name = StringField(default="Enter Your Full Name")
+            netid = StringField(default="Enter Your Netid")
+            @staticmethod
+            def restaurant_field_name(index):
+                return 'restaurant_{}'.format(index)
+            def restaurant_fields(self):
+                for i, rest in enumerate(restaurant):
+                    yield rest.name, getattr(self, F.restaurant_field_name(i))
+            def get_restaurant_freq(self):
+                for rest, field in self.restaurant_fields():
+                    if field.data:
+                        yield rest
+						
+            @staticmethod
+            def food_field_name(index):
+                return 'food_{}'.format(index)
+            def food_fields(self):
+                for i, foods in enumerate(food):
+                    yield foods.name, getattr(self, F.food_field_name(i))
+            def get_food_liked(self):
+                for foods, field in self.food_fields():
+                    if field.data != 0:
+                        yield foods
+						
+						
+            @staticmethod
+            def allergen_field_name(index):
+                return 'allergen_{}'.format(index)
+            def allergen_fields(self):
+                for i, allergens in enumerate(allergen):
+                    yield allergens.allergenType, getattr(self, F.allergen_field_name(i))
+            def get_allergens(self):
+                for allergens, field in self.allergen_fields():
+                    if field.data != 0:
+                        yield allergens, field.data
+        
+	
+							
+        for i, rest in enumerate(restaurant):
+            field_name = F.restaurant_field_name(i)
+            setattr(F, field_name, BooleanField(default=0))
+        	
+        for i, foo in enumerate(food):
+            field_name = F.food_field_name(i)
+            setattr(F, field_name, BooleanField(default=0))
+
+        for i, aller in enumerate(allergen):
+            field_name = F.allergen_field_name(i)
+            setattr(F, field_name, BooleanField(default=0))
+
+
+        return F()
+
+
 class StudentEditFormFactory:
     @staticmethod
     def form(student, restaurant, food, allergen):
