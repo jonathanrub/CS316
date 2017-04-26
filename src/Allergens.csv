@@ -1,1 +1,10 @@
-type,medicationdairy,epipenwheat,epipensoybeans,epipenpeanuts,epipentree nuts,epipenshellfish,epipenfish,epipeneggs,epipendairy ,epipen
+type,medication
+dairy,epipen
+wheat,epipen
+soybeans,epipen
+peanuts,epipen
+tree nuts,epipen
+shellfish,epipen
+fish,epipen
+eggs,epipen
+dairy,epipen
