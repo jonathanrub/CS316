@@ -5,7 +5,19 @@
   {{form.csrf_token}}
   <p>
     What do you want to search for? 
+
     {{form.search}}
   </p>
+  <ul>
+    {% for i in range(form.searches.__len__()) %}
+    <li>
+    <p>
+    {{form.labels[i]}} {{form.searches.entries[i]}}
+
+
+    </p>
+    </li>
+    {% endfor %}
+  </ul>
 </form>
 {% endblock %}

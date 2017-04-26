@@ -111,7 +111,12 @@ def add_student():
 
 @app.route('/search/')
 def search():
-    form = forms.SearchForm.form()
+    
+    l = []
+    l.append(("Restaurant",models.Restaurant))
+    l.append(("Food",models.Food))
+    l.append(("Serves",models.Serves))
+    form = forms.SearchForm.form(l)
     return render_template('search.html',form=form)
 
 @app.route('/edit-student/<name>', methods=['GET', 'POST'])
