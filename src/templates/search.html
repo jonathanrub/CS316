@@ -9,15 +9,26 @@
     {{form.search}}
   </p>
   <ul>
-    {% for i in range(form.searches.__len__()) %}
+    {% for i in range(form.textSearches.__len__()) %}
     <li>
     <p>
-    {{form.labels[i]}} {{form.searches.entries[i]}}
+    {{form.textSearches.entries[i].myLabel}} {{form.textSearches.entries[i]}}
+
+
+    </p>
+    </li>
+    {% endfor %}
+    {% for i in range(form.numberSearches.__len__()) %}
+    <li>
+    <p>
+    {{form.numberSearches.entries[i].myLabel}} {{form.numberSearches.entries[i]}}
 
 
     </p>
     </li>
     {% endfor %}
   </ul>
+  <input type="submit" value="Search"/>
+  {% if 'database' in form.errors %}<p>{{form.errors['database']}}</p>{% endif %}
 </form>
 {% endblock %}

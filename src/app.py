@@ -109,15 +109,150 @@ def add_student():
     else:
         return render_template('add-Student.html', form=form)
 
-@app.route('/search/')
+@app.route('/handle_results/',methods=['POST'])
+def handle_results():
+    form = request.form.to_dict()
+    print request.data
+    #print form.keys()
+    for key in form.keys():
+        print key, form[key]
+    textSearches = form["textSearches"]
+    print textSearches
+    try:
+        while form.textSearches.__len__() > 0:
+            entry = form.textSearches.pop_entry()
+            print entry.select.data
+            #print entry.myLabel
+            #print entry.select.choices
+            if(entry.myLabel != ""):
+                table = str(entry.myLabel.split(" ",1)[0])
+                column = str(entry.myLabel.split(" ",1)[1])
+                filterType = entry.select.data
+                criteria = entry.criteria.data
+                print (table,column, filterType, criteria)
+
+        
+            
+        bigTable = db.session.query(models.Restaurant,models.Food,models.Serves).filter(models.Restaurant.name == models.Serves.restaurant_name).\
+        filter(models.Serves.food_name == models.Food.name).add_columns(models.Restaurant.name,models.Restaurant.location,models.Serves.food_name,models.Serves.price).all()
+        filteredResult = []
+        for result in bigTable:
+            print result.name
+        #print(bigTable)
+        #rest_serves = rest.query.join(serves,rest.name==serves.restaurant_name).add_columns(rest.name, rest.location, serves.food_name,serves.price)
+        #bigTable = rest_serves.query.join(food,rest_serves.food_name==food.name)
+        #print bigTable
+        
+        return render_template('results.html', results=bigTable)
+    except BaseException as e:
+        form.errors['database'] = str(e)
+        print e
+        print "error here"
+        return render_template('search.html',form=form)
+
+@app.route('/search', methods=['GET','POST'])
 def search():
-    
     l = []
+    
+
     l.append(("Restaurant",models.Restaurant))
     l.append(("Food",models.Food))
-    l.append(("Serves",models.Serves))
     form = forms.SearchForm.form(l)
-    return render_template('search.html',form=form)
+    #l.append(("Serves",models.Serves))
+    
+    if form.is_submitted():
+        try:
+            textSearchTables = [("Food","name"),("Restaurant","location"),("Restaurant","name")]
+            numberSearchTables = [("Food","calories")]
+            queryList = []
+            counter = 0
+            while form.textSearches.__len__() > 0:
+                entry = form.textSearches.pop_entry()
+                print entry.select.data
+
+                #print entry.label
+                #print entry.select.choices
+                if(entry.myLabel == ""):
+                    print entry.myLabel
+                    table = textSearchTables[counter][0]
+                    column = textSearchTables[counter][1]
+                    filterType = entry.select.data
+                    criteria = entry.criteria.data
+                    queryList.append((table,column, str(filterType), str(criteria)))
+                    counter+=1
+            counter = 0
+            while form.numberSearches.__len__() > 0:
+                entry = form.numberSearches.pop_entry()
+                print entry.select.data
+                #print entry.label
+                #print entry.select.choices
+                if(entry.myLabel == ""):
+                    print entry.myLabel
+                    table = numberSearchTables[counter][0]
+                    column = numberSearchTables[counter][1]
+                    filterType = entry.select.data
+                    criteria = entry.criteria.data
+                    queryList.append((table,column, str(filterType), str(criteria)))
+                    counter+=1
+                
+            bigTable = db.session.query(models.Restaurant,models.Food,models.Serves).filter(models.Restaurant.name == models.Serves.restaurant_name).\
+            filter(models.Serves.food_name == models.Food.name).add_columns(models.Restaurant.name,models.Restaurant.location,models.Serves.food_name,models.Food.calories).all()
+            filteredResult = []
+            textDict = {
+            'like': (lambda str1, str2: str2.upper() in str1.upper()),
+            'starts': (lambda str1, str2: str1.upper().startswith(str2.upper())),
+            'ends':(lambda str1, str2: str1.upper().endswith(str2.upper())),
+            'equals':(lambda str1, str2: str1.upper()==str2.upper())
+            }
+
+            for result in bigTable:
+                add = True
+                for query in queryList:
+                    print query
+                    if(query[3]=="" or query[3] is None or query[3]=='None'):
+                        continue
+                    if(query[0]=="Restaurant"):
+                        if(query[1]=="name"):
+                            if(not textDict[query[2]](result.name,query[3])):
+                                add = False
+                        if(query[1]=="location"):
+                            if(not textDict[query[2]](result.location,query[3])):
+                                add = False
+                    if(query[0]=="Food"):
+                        if(query[1]=="name"):
+                            print(result.food_name, " food name")
+                            print textDict[query[2]](result.food_name,query[3])
+                            if(not textDict[query[2]](result.food_name,query[3])):
+                                add = False
+                        if(query[1]=="calories"):
+                            if(query[2]==">"):
+                                add = int(query[3]) <= int(result.calories)
+                            if(query[2]=="<"):
+                                add = int(query[3]) >= int(result.calories)
+
+
+                if(add):
+                    filteredResult.append(result)
+                justRestaurants = []
+                for r in filteredResult:
+                    justRestaurants.append(r.name)
+                print result.name
+            #print(bigTable)
+            #rest_serves = rest.query.join(serves,rest.name==serves.restaurant_name).add_columns(rest.name, rest.location, serves.food_name,serves.price)
+            #bigTable = rest_serves.query.join(food,rest_serves.food_name==food.name)
+            #print bigTable
+            
+            return render_template('results.html', results=filteredResult, column=form.search.data, restaurants=set(justRestaurants))
+        except BaseException as e:
+            form.errors['database'] = str(e)
+            print e
+            print "error here"
+            return render_template('search.html',form=form)
+    
+    
+    else:
+    #    print("error NOW")
+        return render_template('search.html',form=form)
 
 @app.route('/edit-student/<name>', methods=['GET', 'POST'])
 def edit_student(netid):
