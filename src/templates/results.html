@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% block heading %}Results{% endblock %}
+{% block content %}
+  <ul>
+    {% if column=="Restaurant" %}
+    {% for result in restaurants %}
+    <li>
+    <p>
+    
+    <a href="{{url_for('restaurant', name=result)}}">{{result}}</a>
+    </p>
+    </li>
+    {% endfor %}
+    {% endif %}
+    {% if column=="Food" %}
+    {% for result in results %}
+    <li>
+       <p>
+    <a href="{{url_for('restaurant', name=result.name)}}">{{result.name}}</a> | <a href="{{url_for('food', name=result.food_name)}}">{{result.food_name}}</a>
+    {% endfor %}
+    {% endif %}
+ 
+    </p>
+    </li>
+    
+  </ul>
+{% endblock %}
