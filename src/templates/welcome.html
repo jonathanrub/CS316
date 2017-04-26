@@ -9,18 +9,18 @@
   </ul>
 </p>
 <p>Favorite Food:
-  <ul>
+  <div class ="vertical-menu">
     {% for foo in favoriteFoods %}
-     <li><a href="{{url_for('food', name=foo.food_name)}}">{{foo.food_name}}</a></li>   
+     <a href="{{url_for('food', name=foo.food_name)}}">{{foo.food_name}}</a>
     {% endfor %}
-  </ul>
+  </div>
 </p>
 <p>Medications:
-  <ul>
+  <div class ="vertical-menu">
     {% for med in medication %}
-     <li>{{med}}</li>   
+     <p>{{med}}</p> 
     {% endfor %}
-  </ul>
+  </div>
 </p>
 <a href="{{url_for('edit_student', netid=netid)}}">edit</a>
 <hr/>

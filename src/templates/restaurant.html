@@ -1,14 +1,14 @@
 {% extends 'layout.html' %}
-{% block heading %}Restaurant Information: {{restaurant.name}}{% endblock %}
+{% block heading %}<p class="foodtitle">Restaurant Information</p>{% endblock %}
 {% block content %}
 <p>Name: {{restaurant.name}}</p>
 <p>Location: {{restaurant.location}}</p>
 <p>Serves:
-  <ul>
+  <div class ="vertical-menu">
     {% for serve in restaurant.serves %}
-     <li><a href="{{url_for('food', name=serve.food_name)}}">{{serve.food_name}} : {{serve.price}}</a></li>   
+     <a href="{{url_for('food', name=serve.food_name)}}">{{serve.food_name}} : {{serve.price}}</a>
     {% endfor %}
-  </ul>
+  </div>
 </p>
-<hr/>
+
 {% endblock %}
