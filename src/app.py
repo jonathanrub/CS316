@@ -40,6 +40,11 @@ def all_restaurants():
     restaurants = db.session.query(models.Restaurant).all()
     return render_template('all-restaurants.html', restaurants=restaurants)
 
+@app.route('/all-foods')
+def all_foods():
+    foods = db.session.query(models.Food).all()
+    return render_template('all-foods.html', foods=foods)
+
 @app.route('/restaurant/<name>')
 def restaurant(name):
     restaurant = db.session.query(models.Restaurant)\
@@ -74,8 +79,19 @@ def food(name):
 def welcome(netid):
     student = db.session.query(models.Student)\
         .filter(models.Student.netid == netid).one()
+    allergies = db.session.query(models.IsAllergicTo)\
+        .filter(models.IsAllergicTo.student_netid == netid)
     favoriteRestaurants = db.session.query(models.EatsAt)\
         .filter(models.EatsAt.student_netid == netid)
+    favoriteFoods = db.session.query(models.Eats)\
+        .filter(models.Eats.student_netid == netid)
+    medications = []
+    for aller in allergies:
+        allergen = db.session.query(models.Allergens)\
+            .filter(models.Allergens.allergenType ==aller.allergenType).first()
+        if(allergen is not None):
+            medications.append(allergen.medication)
+		
     openRestaurants = []
     for rest in favoriteRestaurants:
         day = datetime.datetime.now().weekday()+1
@@ -86,7 +102,7 @@ def welcome(netid):
             continue 
         if(isopen.open_time <= time and isopen.close_time >= time):
             openRestaurants.append(rest)
-    return render_template('welcome.html', netid=netid,openRestaurants=openRestaurants)
+    return render_template('welcome.html', netid=netid,openRestaurants=openRestaurants, favoriteFoods=favoriteFoods, medication=medications)
 
 @app.route('/add-student', methods=['GET', 'POST'])
 def add_student():
@@ -102,7 +118,7 @@ def add_student():
 							   form.get_allergens())
             user = netid=form.netid.data
             db.session.commit()
-            return redirect(url_for('welcome', netid=form.netid.data,openRestaurants=[]))
+            return redirect(url_for('welcome', netid=form.netid.data))
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('add-Student.html', form=form)
@@ -213,7 +229,7 @@ def search():
     #    print("error NOW")
         return render_template('search.html',form=form)
 
-@app.route('/edit-student/<name>', methods=['GET', 'POST'])
+@app.route('/edit-student/<netid>', methods=['GET', 'POST'])
 def edit_student(netid):
     student = db.session.query(models.Student)\
         .filter(models.Student.netid == netid).one()
@@ -224,10 +240,10 @@ def edit_student(netid):
     if form.validate_on_submit():
         try:
             form.errors.pop('database', None)
-            models.Student.edit(name, form.name.data, student.netid, form.netid.data,
+            models.Student.edit(form.name.data, student.netid, form.netid.data,
                                 form.get_restaurant_freq(), form.get_food_liked(),
 							   form.get_allergens())
-            return redirect(url_for('edit_student', name=form.name.data))
+            return redirect(url_for('welcome', netid=form.netid.data))
         except BaseException as e:
             form.errors['database'] = str(e)
             return render_template('edit-student.html', student=student, form=form)

@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+{% block heading %}All Foods{% endblock %}
+{% block content %}
+<div class ="vertical-menu">
+  {% for food in foods %}
+  <a href="{{url_for('food', name=food.name)}}">{{food.name}}</a>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,14 +1,14 @@
 {% extends 'layout.html' %}
-{% block heading %}Food Information: {{food.name}}{% endblock %}
+{% block heading %}<p class="foodtitle">Food Information</p>{% endblock %}
 {% block content %}
-<p>Name: {{food.name}}</p>
+<p>Food name: {{food.name}}</p>
 <p>Calories: {{food.calories}}</p>
-<p>Allergens:
-  <ul>
+
+<p>Allergens: </p>
+  <div class ="vertical-menu">
     {% for allergen in food.allergens %}
-    <li>{{allergen.allergenType}}</li>
+    <p>{{allergen.allergenType}}</p>
     {% endfor %}
-  </ul>
+  </div>
 </p>
-<hr/>
 {% endblock %}

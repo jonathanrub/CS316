@@ -4,9 +4,24 @@
 <p>Open restaurants:
   <ul>
     {% for rest in openRestaurants %}
-     <li><a href="{{url_for('restaurant', name=rest.restaurant_name)}}">{{rest.restaurant_name}}</a></li>   
+     <li><a href="{{url_for('restaurant', name=rest.restaurant_name)}}">{{rest.restaurant_name}}</a></li>
     {% endfor %}
   </ul>
 </p>
+<p>Favorite Food:
+  <div class ="vertical-menu">
+    {% for foo in favoriteFoods %}
+     <a href="{{url_for('food', name=foo.food_name)}}">{{foo.food_name}}</a>
+    {% endfor %}
+  </div>
+</p>
+<p>Medications:
+  <div class ="vertical-menu">
+    {% for med in medication %}
+     <p>{{med}}</p> 
+    {% endfor %}
+  </div>
+</p>
+<a href="{{url_for('edit_student', netid=netid)}}">edit</a>
 <hr/>
 {% endblock %}

@@ -1,12 +1,10 @@
 {% extends 'layout.html' %}
 {% block heading %}All Restaurants{% endblock %}
 {% block content %}
-<ul>
+<h1><img src="/static/img/westunion3497.png"/>
+<div class ="vertical-menu">
   {% for restaurant in restaurants %}
-  <li><a href="{{url_for('restaurant', name=restaurant.name)}}">{{restaurant.name}}</a></li>
+  <a href="{{url_for('restaurant', name=restaurant.name)}}">{{restaurant.name}}</a>
   {% endfor %}
-</ul>
-<hr/>
-<p>{{restaurants|length}} restaurant{{restaurants|length|pluralize}}
-  found in the database.</p>
+</div>
 {% endblock %}
