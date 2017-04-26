@@ -85,12 +85,12 @@ def welcome(netid):
         .filter(models.EatsAt.student_netid == netid)
     favoriteFoods = db.session.query(models.Eats)\
         .filter(models.Eats.student_netid == netid)
-    medications = []
+    medications = set()
     for aller in allergies:
         allergen = db.session.query(models.Allergens)\
             .filter(models.Allergens.allergenType ==aller.allergenType).first()
         if(allergen is not None):
-            medications.append(allergen.medication)
+            medications.add(allergen.medication)
 		
     openRestaurants = []
     for rest in favoriteRestaurants:
