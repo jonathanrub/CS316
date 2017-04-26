@@ -83,12 +83,12 @@ class Student(db.Model):
             raise e
 			
     @staticmethod
-    def edit(old_name, name, old_netid, netid, restaurant_freq, food_liked, allergic_to):
+    def edit(name, old_netid, netid, restaurant_freq, food_liked, allergic_to):
         try:
             db.session.execute('DELETE FROM eatsat WHERE student_netid = :netid',dict(netid=old_netid))
             db.session.execute('DELETE FROM eats WHERE student_netid = :netid',dict(netid=old_netid))
             db.session.execute('DELETE FROM isallergicto WHERE student_netid = :netid',dict(netid=old_netid))
-            db.session.execute('UPDATE student SET name = :name, netid = :netid WHERE netid = :old_netid',dict(old_name=old_name, name=name, old_netid=old_netid, netid=netid))
+            db.session.execute('UPDATE student SET name = :name, netid = :netid WHERE netid = :old_netid',dict(name=name, old_netid=old_netid, netid=netid))
 			
             for rest in restaurant_freq:
                 db.session.execute('INSERT INTO eatsat VALUES(:student_netid, :restaurant_name)',dict(student_netid=netid, restaurant_name=rest))
