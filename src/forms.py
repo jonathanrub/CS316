@@ -112,13 +112,11 @@ class StudentEditFormFactory:
             field_name = F.restaurant_field_name(i)
             default = 'checked' if rest.name in restaurant_freq else None
             setattr(F, field_name, BooleanField(default=default))
-        	
-        food_liked = [foodlike.name for foodlike in student.eats]
+        food_liked = [foodlike.food_name for foodlike in student.eats]
         for i, foo in enumerate(food):
             field_name = F.food_field_name(i)
             default = 'checked' if foo.name in food_liked else None
             setattr(F, field_name, BooleanField(default=default))
-        	
         allergic_to = [allerto.allergenType for allerto in student.is_allergic_to]
         for i, aller in enumerate(allergen):
             field_name = F.allergen_field_name(i)

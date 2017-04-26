@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block heading %}All Foods{% endblock %}
+{% block content %}
+<ul>
+  {% for food in foods %}
+  <li><a href="{{url_for('food', name=food.name)}}">{{food.name}}</a></li>
+  {% endfor %}
+</ul>
+<hr/>
+<p>{{foods|length}} food{{foods|length|pluralize}}
+  found in the database.</p>
+{% endblock %}

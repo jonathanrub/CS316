@@ -11,6 +11,11 @@
   <body>
     <h1><img src="/static/img/beer.jpg" style="float:right"/> Flask <a href="/">DB-Duke Dining Example</a></h1>
     <hr/>
+	<div class="topnav" id="myTopnav">
+		<a href='/'>Log in</a>
+  		<a href='/all-restaurants'>All Restaurants</a>
+  		<a href="/all-foods">All Food</a>
+	  </div>
     <h2 id="heading">{% block heading %}{% endblock %}</h2>
     {% block content %}{% endblock %}
   </body>
