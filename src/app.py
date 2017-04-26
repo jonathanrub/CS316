@@ -109,47 +109,6 @@ def add_student():
     else:
         return render_template('add-Student.html', form=form)
 
-@app.route('/handle_results/',methods=['POST'])
-def handle_results():
-    form = request.form.to_dict()
-    print request.data
-    #print form.keys()
-    for key in form.keys():
-        print key, form[key]
-    textSearches = form["textSearches"]
-    print textSearches
-    try:
-        while form.textSearches.__len__() > 0:
-            entry = form.textSearches.pop_entry()
-            print entry.select.data
-            #print entry.myLabel
-            #print entry.select.choices
-            if(entry.myLabel != ""):
-                table = str(entry.myLabel.split(" ",1)[0])
-                column = str(entry.myLabel.split(" ",1)[1])
-                filterType = entry.select.data
-                criteria = entry.criteria.data
-                print (table,column, filterType, criteria)
-
-        
-            
-        bigTable = db.session.query(models.Restaurant,models.Food,models.Serves).filter(models.Restaurant.name == models.Serves.restaurant_name).\
-        filter(models.Serves.food_name == models.Food.name).add_columns(models.Restaurant.name,models.Restaurant.location,models.Serves.food_name,models.Serves.price).all()
-        filteredResult = []
-        for result in bigTable:
-            print result.name
-        #print(bigTable)
-        #rest_serves = rest.query.join(serves,rest.name==serves.restaurant_name).add_columns(rest.name, rest.location, serves.food_name,serves.price)
-        #bigTable = rest_serves.query.join(food,rest_serves.food_name==food.name)
-        #print bigTable
-        
-        return render_template('results.html', results=bigTable)
-    except BaseException as e:
-        form.errors['database'] = str(e)
-        print e
-        print "error here"
-        return render_template('search.html',form=form)
-
 @app.route('/search', methods=['GET','POST'])
 def search():
     l = []
