@@ -16,40 +16,40 @@
     {% endif %}
   </p>
   <p>Restaurant(s) liked:
-    <ul>
+    <div class ="vertical-menu">
       {% for restaurant, field in form.restaurant_fields() %}
-      <li>
+      <p>
         {{restaurant}}: {{field}}
         {% if field.errors %}
         <ul>{% for error in field.errors %}<li>{{error}}</li>{% endfor %}</ul>
         {% endif %}
-      </li>
+      </p>
       {% endfor %}
-    </ul>
+    </div>
   </p>
  <p>Foods(s) liked:
-    <ul>
+    <div class ="vertical-menu">
       {% for food, field in form.food_fields() %}
-      <li>
+      <p>
         {{food}}: {{field}}
         {% if field.errors %}
         <ul>{% for error in field.errors %}<li>{{error}}</li>{% endfor %}</ul>
         {% endif %}
-      </li>
+      </p>
       {% endfor %}
-    </ul>
+    </div>
   </p>
  <p>Alergens(s) have:
-    <ul>
+    <div class ="vertical-menu">
       {% for alergens, field in form.allergen_fields() %}
-      <li>
+      <p>
         {{alergens}}: {{field}}
         {% if field.errors %}
         <ul>{% for error in field.errors %}<li>{{error}}</li>{% endfor %}</ul>
         {% endif %}
-      </li>
+      </p>
       {% endfor %}
-    </ul>
+    </div>
   </p>
   <hr/>
   <input type="reset" value="Reset"/>
