@@ -1,5 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, IntegerField
+from wtforms import StringField, BooleanField, IntegerField, SelectField, FieldList, FormField
+from wtforms.validators import DataRequired
+from sqlalchemy import inspect
+from collections import namedtuple
 
 
 class LoginFormFactory:
@@ -125,3 +128,90 @@ class StudentEditFormFactory:
 
 
         return F()
+
+
+class NumberForm(FlaskForm):
+    myLabel = ""
+    choices = [(">","greater than"),("<","less than")]
+    select = SelectField(u'filter',choices=choices)
+    criteria = IntegerField()
+class TextForm(FlaskForm):
+    myLabel = ""
+
+    choices = [("like","contains"),("starts","starts with"),("ends","ends with"),("equals","is exactly")]
+    select = SelectField(u'filter',choices=choices,default='')
+    criteria = StringField(default="")
+        
+    def init(self,label):
+        myLabel = label
+    # @staticmethod
+    # def form(label):
+    #     class F(FlaskForm):
+    #         critera = StringField(default="Search...")
+    #         myLabel = ""
+    #         choices = [("like","contains"),("starts","starts with"),("ends","ends with"),("equals","is exactly")]
+    #         select = SelectField(u'filter',choices=choices)
+    #         def init(self,label):
+    #             myLabel = label
+    #     f = F()
+    #     f.init(label)
+    #     return f
+
+class MiniSearchForm(FlaskForm):
+    myHeader = ""
+    textSearches = FieldList(FormField(TextForm))
+    numberSearches = FieldList(FormField(NumberForm))
+
+    
+
+class SearchForm:
+    @staticmethod
+    def form(args):
+        class G(FlaskForm):
+            choices = [("Restaurant","Restaurant"),("Food","Food")]
+            search = SelectField(u'Searching for a...', choices=choices)
+            #searches = FieldList(SelectField(u'Name'))
+            textSearches = FieldList(FormField(TextForm))
+            numberSearches = FieldList(FormField(NumberForm))
+            searches = FieldList(FormField(MiniSearchForm))
+            sections = {}
+
+            labels = []
+
+
+        g = G()
+
+        for model in args:
+                attributes = []
+                mapper = inspect(model[1])
+                print mapper
+                for column in mapper.columns:
+                    print str(column.type)[0:7]
+                    print column.key
+                    if(str(column.type)[0:7] == "VARCHAR"):
+                        f = TextForm()
+                        f.init(column.key)
+                        Tf = namedtuple('TextForm',['myLabel'])
+                        t1 = Tf(column.key)
+                        g.textSearches.append_entry()
+                        g.textSearches[len(g.textSearches)-1].myLabel = model[0] + " " + column.key
+                        g.labels.append(model[0]+ " " +column.key)
+                        #g.textSearches[len(g.textSearches)-1] = f
+                    if(str(column.type)== "INTEGER"):
+                        g.numberSearches.append_entry()
+                        g.numberSearches[len(g.numberSearches)-1].myLabel = model[0] + " " + column.key
+                        g.labels.append(model[0]+ " " +column.key)
+                    attributes.append(column.key)
+                # select = SelectField(model[0],attributes)
+                # g.searches.append_entry()
+                # print attributes
+                # g.searches[len(g.searches)-1].choices=zip(attributes,attributes)
+                # g.labels.append(model[0])
+                #searches.entries.append_entry(select)
+        print "making search form"
+        print len(g.textSearches.entries)
+        return g
+
+        
+
+
