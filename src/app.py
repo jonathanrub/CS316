@@ -62,6 +62,11 @@ def welcome(netid):
             openRestaurants.append(rest)
     return render_template('welcome.html',student=student,openRestaurants=openRestaurants)
 
+@app.route('/search/')
+def search():
+    form = forms.SearchForm.form()
+    return render_template('search.html',form=form)
+
 @app.route('/edit-student/<name>', methods=['GET', 'POST'])
 def edit_student(name):
     student = db.session.query(models.Student)\

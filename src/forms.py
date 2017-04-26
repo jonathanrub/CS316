@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, IntegerField
+from wtforms import StringField, BooleanField, IntegerField, SelectField
 from wtforms.validators import DataRequired
+from sqlalchemy import inspect
 
 class StudentEditFormFactory:
     @staticmethod
@@ -62,3 +63,21 @@ class StudentEditFormFactory:
 
 
         return F()
+
+class SearchForm:
+    @staticmethod
+    def form():
+        class F(FlaskForm):
+            choices = [("Restaurant","Restaurant"),("Food","Food")]
+            search = SelectField(u'Searching for a...', choices=choices)
+        return F()
+
+    @staticmethod
+    def getAttributes(model):
+        mapper = inspect(model)
+        l = []
+        for column in mapper.attrs:
+            l.append(column.key)
+        return l
+
+
